@@ -38,7 +38,8 @@ for arg in "$@"; do
 		--verbose|-v) VERBOSE=1 ;;
 		ex0[0-8])     SELECTED+=("$arg") ;;
 		-h|--help)
-			sed -n '3,26p' "${BASH_SOURCE[0]}" | sed 's|^# \?||'
+			# BSD sed 는 BRE 에서 \? 를 지원하지 않으므로 -E 로 씁니다.
+			sed -n '3,26p' "${BASH_SOURCE[0]}" | sed -E 's|^# ?||'
 			exit 0 ;;
 		*)
 			echo "unknown argument: $arg (try --help)" >&2

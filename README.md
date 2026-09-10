@@ -20,8 +20,6 @@
 | ex10 | `map`                      | 2D → 1D 매핑 (공간 채움 곡선) |
 | ex11 | `reverse_map`              | 1D → 2D 역매핑 |
 
-ex00–ex08 구현 완료. ex09–ex11은 미구현(ex10/ex11은 subject상 필수 아님).
-
 ## 디렉터리 구조
 
 ```
@@ -44,16 +42,23 @@ subject는 turn-in 디렉터리나 파일 목록을 규정하지 않습니다(Ch
 ## 빌드 / 실행
 
 ```sh
-cd ex00
-make          # 바이너리 빌드 (예: ./adder)
-./adder       # 실행
-make clean    # 오브젝트 파일 제거
+cd ex05
+make          # 바이너리 빌드 (여기서는 ./negation_normal_form)
+./negation_normal_form
+make clean    # 오브젝트 파일(obj/) 제거
 make fclean   # 오브젝트 + 바이너리 제거
 make re       # fclean 후 재빌드
 ```
 
-각 ex의 Makefile은 자기에게 특수한 것만 선언하고 나머지는 `common/Makefile.inc`가
-처리합니다:
+바이너리 이름은 위 Exercises 표와 같고, 해당 ex 폴더 안에 생성됩니다. 각
+Makefile의 `NAME`이 그 이름이므로 확인이 필요하면 다음으로 볼 수 있습니다:
+
+```sh
+grep '^NAME' ex*/Makefile
+```
+
+각 Makefile은 자기에게 특수한 것만 선언하고 빌드 규칙은 전부
+`common/Makefile.inc`가 처리합니다:
 
 ```make
 NAME = negation_normal_form
@@ -67,18 +72,44 @@ include ../common/Makefile.inc
 `SHARED`에 적은 경로는 `vpath %.cpp`와 `-I`로 연결되므로, 폴더에 들어가
 `make`만 해도 공유 모듈이 함께 빌드됩니다. 파일을 복사해 두지 않습니다.
 
+> **주의** — 이 구조에서 ex 폴더는 단독으로 들고 나갈 수 없습니다.
+> `common/Makefile.inc`(그리고 `SHARED`에 적힌 소스)가 상대 경로로 필요하므로,
+> 폴더 하나만 복사하면 `No rule to make target '../common/Makefile.inc'`로
+> 실패합니다. 저장소 전체를 함께 두면 됩니다 — subject도 저장소 단위로
+> 평가하므로 문제되지 않습니다.
+
 ## 테스트
 
+저장소 루트에서 실행합니다.
+
 ```sh
-./run_tests.sh              # 전체 (약 18초)
-./run_tests.sh --quick      # 무작위 대량 검증 생략 (약 1초)
-./run_tests.sh --verbose    # 빌드/실행 출력까지 표시
-./run_tests.sh ex03 ex04    # 특정 ex 만
+./run_tests.sh              # 전체
+./run_tests.sh --quick      # 무작위 대량 검증을 줄여서 실행
+./run_tests.sh --verbose    # 각 검사의 상세 출력까지 표시
+./run_tests.sh ex03 ex06    # 특정 ex 만 (ex00-ex08)
+./run_tests.sh --help       # 사용법
 ```
 
-실패 시 exit 1입니다. 러너는 각 ex를 `-Werror`로 빌드하고, `main`이 정상
-종료하는지 확인한 뒤, `tests/drivers/`의 드라이버로 subject 기준값을 단정하고,
-마지막으로 ex00–ex02의 허용 연산자를 검사합니다.
+러너는 다음 순서로 검사하고, 하나라도 실패하면 exit 1 과 함께 실패 목록을
+요약합니다. 통과한 검사는 한 줄로만 보고하고, 실패한 검사만 상세 출력을
+펼칩니다(`--verbose`를 주면 전부 펼침).
+
+1. 각 ex 를 `make re` 로 `-Werror` 빌드
+2. 각 ex 의 `main` 실행 — 정상 종료(exit 0) 확인
+3. `tests/drivers/` 의 드라이버로 subject 기준값 단정
+4. ex00–ex02 의 허용 연산자 검사(금지된 산술 연산자 사용 여부)
+
+두 가지 알아둘 점:
+
+- 러너는 **끝에 `make fclean` 을 돌려 빌드 산물을 지웁니다.** 테스트 후
+  바이너리가 사라진 것처럼 보이는 게 정상이고, 다시 쓰려면 해당 ex 폴더에서
+  `make` 하면 됩니다.
+- 실행 시간은 **대부분 컴파일**입니다(ex 9개 `make re` + 드라이버 9개를 `-O2`
+  로 컴파일). 그래서 `--quick` 은 무작위 검증량만 줄이므로 체감상 3분의 1
+  정도만 짧아집니다 — 큰 차이를 기대할 옵션은 아닙니다.
+
+검사 대상은 구현이 끝난 ex00–ex08 입니다. ex09–ex11 은 아직 스텁이라
+러너에 등록되어 있지 않습니다.
 
 드라이버는 각 ex의 구현 소스를 직접 링크하며 `main.cpp`의 출력을 스냅샷하지
 않습니다. 따라서 `main`에 테스트를 추가해도 러너가 깨지지 않습니다.

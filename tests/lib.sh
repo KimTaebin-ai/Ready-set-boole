@@ -59,7 +59,7 @@ summary() {
 	section "요약"
 	if [ "$FAILED" -eq 0 ]; then
 		printf '  %s%d개 통과, 실패 없음%s' "$GREEN" "$PASSED" "$OFF"
-		[ "${QUICK:-0}" -eq 1 ] && printf ' %s(--quick: 무작위 대량 검증 생략)%s' \
+		[ "${QUICK:-0}" -eq 1 ] && printf ' %s(--quick: 무작위 대량 검증 축소)%s' \
 			"$YELLOW" "$OFF"
 		printf '\n'
 		return 0
