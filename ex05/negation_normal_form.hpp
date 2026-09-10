@@ -3,13 +3,17 @@
 
 # include <string>
 
-// Time complexity:  O(n)
-// Space complexity: O(n)
+// Time complexity:  O(n) for !, & and |; exponential in the number of nested
+//                   >, = and ^ operators, which are rewritten by duplicating
+//                   their operands. The subject sets no limit here.
+// Space complexity: same as the size of the returned formula.
 //
 // Returns the negation normal form of an RPN boolean formula:
 //   - only !, &, | operators may appear in the result
 //   - negation may only appear directly in front of a variable
-// Requires the RPN parser/AST from ex03 (copy into this folder).
+//
+// Throws std::invalid_argument on malformed input.
+// Uses the shared AST module and NNF rewrite (common/ast.*, common/nnf.*).
 std::string negation_normal_form(const std::string& formula);
 
 #endif

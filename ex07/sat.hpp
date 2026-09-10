@@ -9,6 +9,7 @@
 // Returns true iff the RPN boolean formula is satisfiable, i.e. there is
 // at least one assignment of its variables that makes it true.
 // Brute-force is acceptable per the subject.
+// Uses the shared AST module (common/ast.*).
 bool sat(const std::string& formula);
 
 #endif

@@ -13,6 +13,7 @@
 //   & | ^ > =      and/or/xor/imply/equiv (binary)
 //
 // Throws std::invalid_argument on malformed input.
+// Uses the shared AST module (common/ast.*).
 bool eval_formula(const std::string& formula);
 
 #endif

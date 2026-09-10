@@ -8,8 +8,8 @@
 //
 // Prints the truth table for an RPN boolean formula.
 // Variables are uppercase letters A-Z; operators are the same set as ex03.
-// Re-uses the RPN evaluator from ex03 (copy eval_formula.* into this folder
-// when implementing, or factor a shared AST module).
+// On malformed input it writes an error message to stderr and prints nothing.
+// Uses the shared AST module (common/ast.*).
 void print_truth_table(const std::string& formula);
 
 #endif
