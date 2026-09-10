@@ -7,7 +7,9 @@
 // Space complexity: O(2^n) worst-case
 //
 // Returns the conjunctive normal form (clauses of disjunctions ANDed
-// together) of an RPN boolean formula. Builds on ex05's NNF as a first step.
+// together) of an RPN boolean formula. Runs the shared NNF rewrite from ex05
+// first, then distributes | over &.
+// Uses the shared AST module and NNF rewrite (common/ast.*, common/nnf.*).
 std::string conjunctive_normal_form(const std::string& formula);
 
 #endif

@@ -1,2 +1,19 @@
 .claude
 target
+
+# 빌드 산물
+obj/
+
+# 각 ex 의 바이너리 (Makefile 의 NAME)
+ex*/adder
+ex*/multiplier
+ex*/gray_code
+ex*/eval_formula
+ex*/print_truth_table
+ex*/negation_normal_form
+ex*/conjunctive_normal_form
+ex*/sat
+ex*/powerset
+ex*/eval_set
+ex*/map
+ex*/reverse_map

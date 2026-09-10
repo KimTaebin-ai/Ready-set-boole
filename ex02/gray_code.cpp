@@ -2,7 +2,7 @@
 
 uint32_t gray_code(uint32_t n)
 {
-	(void)n;
-	// TODO: implement standard binary -> reflected gray code conversion.
-	return 0;
+	// Reflected binary code: bit i of the result is bit i of n flipped by its
+	// left neighbour, which makes consecutive values differ by a single bit.
+	return n ^ (n >> 1);
 }
