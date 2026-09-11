@@ -36,7 +36,7 @@ for arg in "$@"; do
 	case "$arg" in
 		--quick)      QUICK=1 ;;
 		--verbose|-v) VERBOSE=1 ;;
-		ex0[0-8])     SELECTED+=("$arg") ;;
+		ex0[0-9]|ex1[01]) SELECTED+=("$arg") ;;
 		-h|--help)
 			# BSD sed 는 BRE 에서 \? 를 지원하지 않으므로 -E 로 씁니다.
 			sed -n '3,26p' "${BASH_SOURCE[0]}" | sed -E 's|^# ?||'
@@ -47,7 +47,8 @@ for arg in "$@"; do
 	esac
 done
 
-[ ${#SELECTED[@]} -eq 0 ] && SELECTED=(ex00 ex01 ex02 ex03 ex04 ex05 ex06 ex07 ex08)
+[ ${#SELECTED[@]} -eq 0 ] && SELECTED=(ex00 ex01 ex02 ex03 ex04 ex05 ex06 ex07 ex08
+	ex09 ex10 ex11)
 
 WORK="$(mktemp -d)"
 trap 'rm -rf "$WORK"' EXIT
@@ -55,9 +56,10 @@ trap 'rm -rf "$WORK"' EXIT
 source "$ROOT/tests/lib.sh"
 
 if [ "$QUICK" -eq 1 ]; then
-	SMALL_BOUND=64; RANDOM_ROUNDS=0; FORMULA_ROUNDS=50
+	SMALL_BOUND=64; RANDOM_ROUNDS=0; FORMULA_ROUNDS=50; CURVE_ROUNDS=2000
 else
 	SMALL_BOUND=400; RANDOM_ROUNDS=2000000; FORMULA_ROUNDS=3000
+	CURVE_ROUNDS=200000
 fi
 
 # 각 ex 의 드라이버 컴파일 인자와 통과 라벨. 배열로 넘겨 경로에 공백이
@@ -108,6 +110,18 @@ set_driver() {
 		DRIVER_LABEL="멱집합이 subject 예시 + 정의를 만족"
 		DRIVER_ARGS=(-I"$ROOT/ex08" "$DRIVERS/powerset.cpp"
 			"$ROOT/ex08/powerset.cpp") ;;
+	ex09)
+		DRIVER_LABEL="eval_set 이 subject 예시 + 독립 집합대수 기준과 일치"
+		DRIVER_ARGS=("${common[@]}" "${rounds[@]}" -I"$ROOT/ex09"
+			"$DRIVERS/set_eval.cpp" "$ROOT/ex09/eval_set.cpp"
+			"$ROOT/common/ast.cpp") ;;
+	# map 과 reverse_map 은 서로의 역함수라 함께 봐야 의미가 있으므로 같은
+	# 드라이버를 양쪽에 배정합니다.
+	ex10|ex11)
+		DRIVER_LABEL="map/reverse_map 이 전단사이고 양방향 왕복이 정확"
+		DRIVER_ARGS=(-DRANDOM_ROUNDS=$CURVE_ROUNDS -I"$ROOT/ex10"
+			-I"$ROOT/ex11" "$DRIVERS/curve.cpp" "$ROOT/ex10/map.cpp"
+			"$ROOT/ex11/reverse_map.cpp") ;;
 	esac
 }
 
