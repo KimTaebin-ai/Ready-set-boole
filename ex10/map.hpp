@@ -6,10 +6,14 @@
 // Time complexity:  O(1)   (bounded by 16 bit-pair iterations)
 // Space complexity: O(1)
 //
-// Bijection N^2 -> [0, 1] using a space-filling curve. The point (x, y) is
-// mapped to a deterministic real value in the unit interval such that the
-// mapping is reversible by reverse_map (ex11). Implementation hint: build a
-// 32-bit interleaved index from x and y (Z-order curve), then divide by 2^32.
+// Maps a point of [0, 2^16 - 1]^2 to a value of [0, 1], injectively: every
+// one of the 2^32 points gets its own value, so reverse_map (ex11) can undo
+// it exactly.
+//
+// Done by interleaving the bits of x and y into a 32-bit Z-order index and
+// dividing by 2^32. The division is exact rather than approximate, since a
+// 32-bit index fits a 53-bit mantissa and the divisor is a power of two.
+// Results therefore land in [0, (2^32 - 1) / 2^32], never on 1.0 itself.
 double map(uint16_t x, uint16_t y);
 
 #endif
