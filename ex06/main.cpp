@@ -51,9 +51,10 @@ int main()
 	// Distribution: (A & B) | C becomes (A | C) & (B | C).
 	test("AB&C|", "AC|BC|&");
 
-	// A | !A is a tautology, so the clause drops and nothing is left to
-	// constrain the formula.
-	test("AA!|", "1");
+	// A | !A is a tautology, so the clause drops and the conjunction is left
+	// empty. That is always true, but the result may only hold variables and
+	// ! & |, so it comes back as a tautological clause rather than as "1".
+	test("AA!|", "AA!|");
 	// A & !A can never hold.
 	test("AA!&", "AA!&");
 	// Repeated literals in one clause collapse.

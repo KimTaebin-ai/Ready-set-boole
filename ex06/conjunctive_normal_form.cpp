@@ -147,14 +147,32 @@ Clauses cnf_of(const Node& node)
 	}
 }
 
-std::string clauses_to_rpn(const Clauses& clauses)
+// The subject requires the result to hold nothing but variables and the
+// symbols ! & |, so the degenerate conjunctions cannot be written as "1" or
+// "0". Both are expressible with a variable instead: X | !X always holds and
+// X & !X never does. `spare` is a variable from the input, or 0 when the
+// formula had none, which only happens for input the subject does not
+// describe (a formula of bare constants).
+std::string clauses_to_rpn(const Clauses& clauses, char spare)
 {
+	// No clauses left is the empty conjunction, which is always true. Dropping
+	// tautological clauses above is what gets us here.
 	if (clauses.empty())
-		return "1";
+	{
+		if (spare == 0)
+			return "1";
+		return std::string(1, spare) + spare + "!|";
+	}
 	for (const Clause& clause : clauses)
 	{
+		// An empty clause is the empty disjunction, always false, so the whole
+		// conjunction is false.
 		if (clause.empty())
-			return "0";
+		{
+			if (spare == 0)
+				return "0";
+			return std::string(1, spare) + spare + "!&";
+		}
 	}
 
 	std::string rpn;
@@ -181,7 +199,9 @@ std::string clauses_to_rpn(const Clauses& clauses)
 std::string conjunctive_normal_form(const std::string& formula)
 {
 	NodePtr tree = parse_formula(formula);
+	std::vector<char> variables = variables_of(*tree);
 	NodePtr rewritten = to_nnf(*tree);
+	char spare = variables.empty() ? 0 : variables.front();
 
-	return clauses_to_rpn(cnf_of(*rewritten));
+	return clauses_to_rpn(cnf_of(*rewritten), spare);
 }

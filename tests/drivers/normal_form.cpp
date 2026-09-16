@@ -24,7 +24,12 @@ static std::string transform(const std::string &formula)
 static int failures = 0;
 
 // NNF: 변수와 ! & | 만 나오고, 모든 ! 은 변수 바로 뒤여야 합니다.
-static bool is_nnf(const std::string &formula, std::string &why)
+//
+// subject 는 결과가 변수와 ! & | 만 담도록 요구하므로, 입력에 상수가 없었다면
+// 출력에도 0 이나 1 이 나와선 안 됩니다. allow_constants 는 subject 범위 밖인
+// 상수 입력을 시험할 때만 켭니다.
+static bool is_nnf(const std::string &formula, std::string &why,
+	bool allow_constants)
 {
 	for (size_t i = 0; i < formula.size(); ++i)
 	{
@@ -33,7 +38,13 @@ static bool is_nnf(const std::string &formula, std::string &why)
 		if (token >= 'A' && token <= 'Z')
 			continue;
 		if (token == '0' || token == '1')
-			continue;   // 상수만으로 된 입력에서만 나옵니다
+		{
+			if (allow_constants)
+				continue;
+			why = std::string("result holds the constant '") + token
+				+ "', but only variables and ! & | are allowed";
+			return false;
+		}
 		if (token == '&' || token == '|')
 			continue;
 		if (token == '!')
@@ -54,9 +65,10 @@ static bool is_nnf(const std::string &formula, std::string &why)
 #ifdef TEST_CNF
 // CNF: NNF 조건에 더해, | 안에 & 가 들어 있으면 안 됩니다. 스택 원소의
 // 수준을 0=리터럴, 1=절, 2=논리곱으로 두고 | 의 피연산자를 확인합니다.
-static bool is_cnf(const std::string &formula, std::string &why)
+static bool is_cnf(const std::string &formula, std::string &why,
+	bool allow_constants)
 {
-	if (!is_nnf(formula, why))
+	if (!is_nnf(formula, why, allow_constants))
 		return false;
 
 	std::vector<int> levels;
@@ -104,12 +116,13 @@ static bool is_cnf(const std::string &formula, std::string &why)
 }
 #endif
 
-static bool structure_ok(const std::string &formula, std::string &why)
+static bool structure_ok(const std::string &formula, std::string &why,
+	bool allow_constants)
 {
 #ifdef TEST_CNF
-	return is_cnf(formula, why);
+	return is_cnf(formula, why, allow_constants);
 #else
-	return is_nnf(formula, why);
+	return is_nnf(formula, why, allow_constants);
 #endif
 }
 
@@ -142,8 +155,11 @@ static void check_formula(const std::string &formula)
 	}
 
 	std::string why;
+	// 입력에 상수가 있었다면 결과에 상수가 남는 것을 허용합니다.
+	bool had_constants = formula.find('0') != std::string::npos
+		|| formula.find('1') != std::string::npos;
 
-	if (!structure_ok(result, why))
+	if (!structure_ok(result, why, had_constants))
 	{
 		std::printf("%s(\"%s\") = \"%s\" is not in normal form: %s\n", NAME,
 			formula.c_str(), result.c_str(), why.c_str());
