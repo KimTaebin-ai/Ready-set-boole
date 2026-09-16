@@ -58,6 +58,17 @@ static bool binary_kind_of(char token, NodeKind& kind)
 	}
 }
 
+// Deep enough for any formula worth writing, shallow enough that the
+// recursive walks below stay well inside the stack.
+static const size_t max_tree_depth = 10000;
+
+static void check_depth(size_t depth)
+{
+	if (depth > max_tree_depth)
+		throw std::invalid_argument("parse_formula: formula nests deeper than "
+			+ std::to_string(max_tree_depth) + " operators");
+}
+
 static char symbol_of(NodeKind kind)
 {
 	switch (kind)
@@ -73,15 +84,27 @@ static char symbol_of(NodeKind kind)
 NodePtr parse_formula(const std::string& formula)
 {
 	std::vector<NodePtr> stack;
+	// Parsing itself is a loop, but everything that later walks the tree
+	// recurses, the destructor included. Tracking depth here lets an
+	// over-nested formula come back as an exception instead of as a stack
+	// overflow nobody can catch. Measured to blow up somewhere past 20000
+	// frames, so the cap keeps a wide margin.
+	std::vector<size_t> depths;
 
 	for (char token : formula)
 	{
 		NodeKind kind;
 
 		if (token == '0' || token == '1')
+		{
 			stack.push_back(make_constant(token == '1'));
+			depths.push_back(1);
+		}
 		else if (token >= 'A' && token <= 'Z')
+		{
 			stack.push_back(make_variable(token));
+			depths.push_back(1);
+		}
 		else if (token == '!')
 		{
 			if (stack.empty())
@@ -91,6 +114,8 @@ NodePtr parse_formula(const std::string& formula)
 
 			stack.pop_back();
 			stack.push_back(make_not(std::move(child)));
+			depths.back() += 1;
+			check_depth(depths.back());
 		}
 		else if (binary_kind_of(token, kind))
 		{
@@ -102,11 +127,22 @@ NodePtr parse_formula(const std::string& formula)
 
 			stack.pop_back();
 
+			size_t right_depth = depths.back();
+
+			depths.pop_back();
+
 			NodePtr left = std::move(stack.back());
 
 			stack.pop_back();
+
+			size_t left_depth = depths.back();
+
+			depths.pop_back();
 			stack.push_back(make_binary(kind, std::move(left),
 				std::move(right)));
+			depths.push_back(
+				1 + (left_depth > right_depth ? left_depth : right_depth));
+			check_depth(depths.back());
 		}
 		else
 			throw error("unknown token", token);
