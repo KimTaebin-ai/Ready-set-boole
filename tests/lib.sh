@@ -72,6 +72,26 @@ summary() {
 	return 1
 }
 
+# 각 Makefile 의 NAME 이 .gitignore 에 들어 있는지 확인합니다. 빠지면 make 한
+# 뒤 바이너리가 추적되지 않은 새 파일로 떠서 실수로 커밋됩니다. 목록이
+# 하드코딩이라 NAME 을 바꾸면 조용히 어긋나므로, 그걸 여기서 잡습니다.
+check_gitignore() {
+	local root="$1" dir name missing=""
+
+	for dir in "$root"/ex[0-9][0-9]; do
+		[ -f "$dir/Makefile" ] || continue
+		name="$(awk -F' *= *' '/^NAME/ { print $2; exit }' "$dir/Makefile")"
+		[ -n "$name" ] || continue
+		grep -qx "ex\*/$name" "$root/.gitignore" 2>/dev/null \
+			|| missing="$missing$(basename "$dir") -> $name"$'\n'
+	done
+	if [ -n "$missing" ]; then
+		fail ".gitignore 에 바이너리 누락" "${missing%$'\n'}"
+		return 1
+	fi
+	pass ".gitignore 가 모든 Makefile 의 NAME 을 덮음"
+}
+
 # ex00-ex02 는 & | ^ << >> = 와 비교 연산자만 쓸 수 있고, ++ 는 루프 인덱스에만
 # 허용됩니다. 주석을 지운 뒤 산술 연산자를 찾고 ++ 를 쓰는 for 헤더는 제외하는
 # 어림 검사입니다(같은 줄에 연산까지 적으면 놓칠 수 있습니다).

@@ -71,6 +71,10 @@ set_driver() {
 
 	DRIVER_LABEL=""
 	DRIVER_ARGS=()
+	# 같은 드라이버를 공유하는 ex 는 키가 같아 한 번만 돌고, 표기에는 양쪽을
+	# 함께 적습니다.
+	DRIVER_KEY="$1"
+	DRIVER_SUBJECT="$1"
 	case "$1" in
 	ex00)
 		DRIVER_LABEL="adder 가 subject 값 + 내장 + 와 일치"
@@ -119,6 +123,8 @@ set_driver() {
 	# map 과 reverse_map 은 서로의 역함수라 함께 봐야 의미가 있으므로 같은
 	# 드라이버를 양쪽에 배정합니다.
 	ex10|ex11)
+		DRIVER_KEY="curve"
+		DRIVER_SUBJECT="ex10+ex11"
 		DRIVER_LABEL="map/reverse_map 이 전단사이고 양방향 왕복이 정확"
 		DRIVER_ARGS=(-DRANDOM_ROUNDS=$CURVE_ROUNDS -DGRID_SIDE=$GRID_SIDE
 			-DVALUE_COUNT=$VALUE_COUNT -I"$ROOT/ex10"
@@ -149,15 +155,21 @@ done
 
 section "subject 기준값 검증"
 
+DONE_DRIVERS=""
 for ex in "${BUILT[@]}"; do
 	set_driver "$ex"
 	[ ${#DRIVER_ARGS[@]} -eq 0 ] && continue
-	if compile_driver "$ex: $DRIVER_LABEL" "$WORK/$ex" "${DRIVER_ARGS[@]}"; then
-		run_logged "$ex: $DRIVER_LABEL" "$WORK/$ex"
+	case " $DONE_DRIVERS " in *" $DRIVER_KEY "*) continue ;; esac
+	DONE_DRIVERS="$DONE_DRIVERS $DRIVER_KEY"
+
+	label="$DRIVER_SUBJECT: $DRIVER_LABEL"
+
+	if compile_driver "$label" "$WORK/$DRIVER_KEY" "${DRIVER_ARGS[@]}"; then
+		run_logged "$label" "$WORK/$DRIVER_KEY"
 	fi
 done
 
-section "허용 연산자 검사 (ex00-ex02)"
+section "정적 검사"
 
 in_selection() {
 	local ex
@@ -167,6 +179,7 @@ in_selection() {
 	return 1
 }
 
+check_gitignore "$ROOT"
 in_selection ex00 && check_operators ex00 "$ROOT/ex00/adder.cpp"
 in_selection ex01 && check_operators ex01 "$ROOT/ex01/multiplier.cpp"
 in_selection ex02 && check_operators ex02 "$ROOT/ex02/gray_code.cpp"
