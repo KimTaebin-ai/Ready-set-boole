@@ -1,0 +1,22 @@
+name: tests
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  run-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      # The runner builds every exercise with -Werror and then compiles its
+      # drivers, so the toolchain is all it needs.
+      - name: Show toolchain
+        run: |
+          clang++ --version
+          make --version | head -1
+
+      - name: Run the test suite
+        run: ./run_tests.sh
