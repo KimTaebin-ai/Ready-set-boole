@@ -57,9 +57,10 @@ source "$ROOT/tests/lib.sh"
 
 if [ "$QUICK" -eq 1 ]; then
 	SMALL_BOUND=64; RANDOM_ROUNDS=0; FORMULA_ROUNDS=50; CURVE_ROUNDS=2000
+	GRID_SIDE=64; VALUE_COUNT=4096
 else
 	SMALL_BOUND=400; RANDOM_ROUNDS=2000000; FORMULA_ROUNDS=3000
-	CURVE_ROUNDS=200000
+	CURVE_ROUNDS=200000; GRID_SIDE=256; VALUE_COUNT=65536
 fi
 
 # 각 ex 의 드라이버 컴파일 인자와 통과 라벨. 배열로 넘겨 경로에 공백이
@@ -119,7 +120,8 @@ set_driver() {
 	# 드라이버를 양쪽에 배정합니다.
 	ex10|ex11)
 		DRIVER_LABEL="map/reverse_map 이 전단사이고 양방향 왕복이 정확"
-		DRIVER_ARGS=(-DRANDOM_ROUNDS=$CURVE_ROUNDS -I"$ROOT/ex10"
+		DRIVER_ARGS=(-DRANDOM_ROUNDS=$CURVE_ROUNDS -DGRID_SIDE=$GRID_SIDE
+			-DVALUE_COUNT=$VALUE_COUNT -I"$ROOT/ex10"
 			-I"$ROOT/ex11" "$DRIVERS/curve.cpp" "$ROOT/ex10/map.cpp"
 			"$ROOT/ex11/reverse_map.cpp") ;;
 	esac

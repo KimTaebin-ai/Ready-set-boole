@@ -5,8 +5,10 @@
 # include <vector>
 # include <cstdint>
 
-// Time complexity:  O(U * n + T log T)   U = universe size, n = formula
-//                   length, T = total number of elements given
+// Time complexity:  O(T log T + U * (n + k log T))   U = universe size,
+//                   n = formula length, k = number of sets, T = total number
+//                   of elements given. Each element of the universe is tested
+//                   against every set, then the formula is evaluated for it.
 // Space complexity: O(T)
 //
 // Evaluates an RPN boolean formula where uppercase variables A..Z are

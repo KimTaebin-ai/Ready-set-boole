@@ -13,6 +13,14 @@
 #include <set>
 #include <stdexcept>
 
+// --quick 에서도 줄어들도록 러너가 크기를 넘겨줍니다.
+#ifndef GRID_SIDE
+# define GRID_SIDE 256
+#endif
+#ifndef VALUE_COUNT
+# define VALUE_COUNT 65536
+#endif
+
 static int failures = 0;
 
 // map 이 낼 수 있는 가장 큰 값, (2^32 - 1) / 2^32.
@@ -71,13 +79,13 @@ int main()
 		++failures;
 	}
 
-	// 256x256 구석을 전수 검사: 65536 개 좌표가 65536 개의 서로 다른 값을
+	// 한쪽 구석을 전수 검사: GRID_SIDE^2 개 좌표가 그만큼의 서로 다른 값을
 	// 내고, 모두 원래 좌표로 되돌아와야 합니다.
 	std::set<double> values;
 
-	for (uint32_t x = 0; x < 256; ++x)
+	for (uint32_t x = 0; x < GRID_SIDE; ++x)
 	{
-		for (uint32_t y = 0; y < 256; ++y)
+		for (uint32_t y = 0; y < GRID_SIDE; ++y)
 		{
 			uint16_t narrow_x = static_cast<uint16_t>(x);
 			uint16_t narrow_y = static_cast<uint16_t>(y);
@@ -86,10 +94,10 @@ int main()
 			check_point(narrow_x, narrow_y);
 		}
 	}
-	if (values.size() != 256 * 256)
+	if (values.size() != GRID_SIDE * GRID_SIDE)
 	{
-		std::printf("256x256 grid gave %zu distinct values, want 65536\n",
-			values.size());
+		std::printf("%dx%d grid gave %zu distinct values, want %d\n",
+			GRID_SIDE, GRID_SIDE, values.size(), GRID_SIDE * GRID_SIDE);
 		++failures;
 	}
 
@@ -123,7 +131,7 @@ int main()
 	// (f . f^-1)(n) == n : map 이 실제로 내는 값들에 대해.
 	size_t value_mismatches = 0;
 
-	for (uint32_t i = 0; i < 65536; ++i)
+	for (uint32_t i = 0; i < VALUE_COUNT; ++i)
 	{
 		double n = static_cast<double>(i) / index_count;
 		std::pair<uint16_t, uint16_t> point = reverse_map(n);
@@ -153,7 +161,8 @@ int main()
 	check_throws(2.0);
 	check_throws(1.5);
 
-	std::printf("65536 grid points + %d random coordinates + 65536 values, "
-		"%d mismatches\n", RANDOM_ROUNDS, failures);
+	std::printf("%d grid points + %d random coordinates + %d values, "
+		"%d mismatches\n", GRID_SIDE * GRID_SIDE, RANDOM_ROUNDS, VALUE_COUNT,
+		failures);
 	return failures != 0;
 }
