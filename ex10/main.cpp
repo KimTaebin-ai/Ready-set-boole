@@ -3,14 +3,12 @@
 #include <set>
 #include "map.hpp"
 
-static void show(uint16_t x, uint16_t y)
-{
+static void show(uint16_t x, uint16_t y) {
 	std::cout << "map(" << std::setw(5) << x << ", " << std::setw(5) << y
 	          << ") = " << map(x, y) << std::endl;
 }
 
-int main()
-{
+int main() {
 	// 17 significant digits round-trip a double, so neighbouring values stay
 	// visibly distinct.
 	std::cout << std::setprecision(17);
@@ -28,10 +26,8 @@ int main()
 	std::set<double> values;
 	bool in_range = true;
 
-	for (uint32_t x = 0; x < 256; ++x)
-	{
-		for (uint32_t y = 0; y < 256; ++y)
-		{
+	for (uint32_t x = 0; x < 256; ++x) {
+		for (uint32_t y = 0; y < 256; ++y) {
 			double value = map(static_cast<uint16_t>(x),
 				static_cast<uint16_t>(y));
 

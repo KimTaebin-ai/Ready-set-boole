@@ -2,37 +2,30 @@
 #include <stdexcept>
 #include "conjunctive_normal_form.hpp"
 
-static void test(const std::string& formula, const std::string& expected)
-{
+static void test(const std::string& formula, const std::string& expected) {
 	std::string got = conjunctive_normal_form(formula);
 	std::cout << "cnf(\"" << formula << "\") = \"" << got << "\""
 	          << "  [expected \"" << expected << "\"]" << std::endl;
 }
 
-static void show(const std::string& formula)
-{
+static void show(const std::string& formula) {
 	std::cout << "cnf(\"" << formula << "\") = \""
 	          << conjunctive_normal_form(formula) << "\"" << std::endl;
 }
 
-static void test_invalid(const std::string& formula)
-{
-	try
-	{
+static void test_invalid(const std::string& formula) {
+	try {
 		std::string got = conjunctive_normal_form(formula);
 
 		std::cout << "cnf(\"" << formula << "\") = \"" << got
 		          << "\"  [expected a throw]" << std::endl;
-	}
-	catch (const std::invalid_argument& e)
-	{
+	} catch (const std::invalid_argument& e) {
 		std::cout << "cnf(\"" << formula << "\") threw: " << e.what()
 		          << std::endl;
 	}
 }
 
-int main()
-{
+int main() {
 	// Subject reference examples:
 	test("AB&!",   "A!B!|");
 	test("AB|!",   "A!B!&");

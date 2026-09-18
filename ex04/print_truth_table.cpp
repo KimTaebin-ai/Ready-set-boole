@@ -6,12 +6,10 @@
 
 // One table row: "| 0 | 1 | 1 |", the result in the last cell.
 static std::string row_of(const std::vector<char>& variables,
-                          const Assignment& values, bool result)
-{
+                          const Assignment& values, bool result) {
 	std::string row = "|";
 
-	for (char variable : variables)
-	{
+	for (char variable : variables) {
 		row += ' ';
 		row += values[variable - 'A'] ? '1' : '0';
 		row += " |";
@@ -20,18 +18,14 @@ static std::string row_of(const std::vector<char>& variables,
 	return row;
 }
 
-void print_truth_table(const std::string& formula)
-{
+void print_truth_table(const std::string& formula) {
 	NodePtr tree;
 
 	// Parsing up front both validates the formula and means the rows below
 	// only have to be evaluated, not parsed again.
-	try
-	{
+	try {
 		tree = parse_formula(formula);
-	}
-	catch (const std::invalid_argument& e)
-	{
+	} catch (const std::invalid_argument& e) {
 		std::cerr << "Error: " << e.what() << std::endl;
 		return;
 	}
@@ -40,8 +34,7 @@ void print_truth_table(const std::string& formula)
 	std::string header = "|";
 	std::string separator = "|";
 
-	for (char variable : variables)
-	{
+	for (char variable : variables) {
 		header += ' ';
 		header += variable;
 		header += " |";
@@ -52,8 +45,7 @@ void print_truth_table(const std::string& formula)
 
 	size_t rows = static_cast<size_t>(1) << variables.size();
 
-	for (size_t row = 0; row < rows; ++row)
-	{
+	for (size_t row = 0; row < rows; ++row) {
 		Assignment values = assignment_of(variables, row);
 
 		std::cout << row_of(variables, values, evaluate(*tree, values))

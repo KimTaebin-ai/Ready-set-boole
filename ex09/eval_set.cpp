@@ -9,15 +9,12 @@
 // every set given as a parameter. Kept in order of first appearance so the
 // result comes out in a predictable order.
 static std::vector<int32_t> universe_of(
-	const std::vector<std::vector<int32_t>>& sets)
-{
+	const std::vector<std::vector<int32_t>>& sets) {
 	std::set<int32_t> seen;
 	std::vector<int32_t> universe;
 
-	for (const std::vector<int32_t>& set : sets)
-	{
-		for (int32_t element : set)
-		{
+	for (const std::vector<int32_t>& set : sets) {
+		for (int32_t element : set) {
 			if (seen.insert(element).second)
 				universe.push_back(element);
 		}
@@ -26,8 +23,7 @@ static std::vector<int32_t> universe_of(
 }
 
 std::vector<int32_t> eval_set(const std::string& formula,
-                              const std::vector<std::vector<int32_t>>& sets)
-{
+                              const std::vector<std::vector<int32_t>>& sets) {
 	NodePtr tree = parse_formula(formula);
 	std::vector<char> variables = variables_of(*tree);
 
@@ -38,8 +34,7 @@ std::vector<int32_t> eval_set(const std::string& formula,
 			+ std::to_string(sets.size()) + " sets were given");
 	// A is the first set, B the second, and so on, so a variable's letter is
 	// what picks its set. That only lines up while the letters run from A.
-	for (char variable : variables)
-	{
+	for (char variable : variables) {
 		if (static_cast<size_t>(variable - 'A') >= sets.size())
 			throw std::invalid_argument(
 				std::string("eval_set: no set matches variable '")
@@ -58,8 +53,7 @@ std::vector<int32_t> eval_set(const std::string& formula,
 	// gives a truth value per variable, and then the formula evaluator
 	// handles &, |, !, ^, > and = as it always does. Since the walk only
 	// visits the universe, ! comes out as the complement relative to it.
-	for (int32_t element : universe)
-	{
+	for (int32_t element : universe) {
 		// Indexed by letter, so it holds 26 slots. The count check above
 		// bounds sets.size() to the number of distinct variables, which
 		// cannot exceed 26, so the loop below stays inside the array.

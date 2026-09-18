@@ -10,51 +10,39 @@
 
 static int failures = 0;
 
-static void check(const std::string &formula, bool want)
-{
-	try
-	{
+static void check(const std::string &formula, bool want) {
+	try {
 		bool got = eval_formula(formula);
 
-		if (got != want)
-		{
+		if (got != want) {
 			std::printf("eval_formula(\"%s\"): got %s, want %s\n",
 				formula.c_str(), got ? "true" : "false",
 				want ? "true" : "false");
 			++failures;
 		}
-	}
-	catch (const std::exception &e)
-	{
+	} catch (const std::exception &e) {
 		std::printf("eval_formula(\"%s\") threw unexpectedly: %s\n",
 			formula.c_str(), e.what());
 		++failures;
 	}
 }
 
-static void check_throws(const std::string &formula)
-{
-	try
-	{
+static void check_throws(const std::string &formula) {
+	try {
 		bool got = eval_formula(formula);
 
 		std::printf("eval_formula(\"%s\"): returned %s, want a throw\n",
 			formula.c_str(), got ? "true" : "false");
 		++failures;
-	}
-	catch (const std::invalid_argument &)
-	{
-	}
-	catch (const std::exception &e)
-	{
+	} catch (const std::invalid_argument &) {
+	} catch (const std::exception &e) {
 		std::printf("eval_formula(\"%s\"): threw %s, want "
 			"std::invalid_argument\n", formula.c_str(), e.what());
 		++failures;
 	}
 }
 
-int main()
-{
+int main() {
 	// subject 의 예시 전체.
 	check("10&", false);
 	check("10|", true);
@@ -81,8 +69,7 @@ int main()
 	const char *equivalence[4] = { "00=", "01=", "10=", "11=" };
 	const bool equivalence_want[4] = { true, false, false, true };
 
-	for (int i = 0; i < 4; ++i)
-	{
+	for (int i = 0; i < 4; ++i) {
 		check(conjunction[i], conjunction_want[i]);
 		check(disjunction[i], disjunction_want[i]);
 		check(exclusive[i], exclusive_want[i]);
@@ -116,22 +103,19 @@ int main()
 	std::mt19937 rng(20260910);
 	long long compared = 0;
 
-	for (int i = 0; i < RANDOM_ROUNDS; ++i)
-	{
+	for (int i = 0; i < RANDOM_ROUNDS; ++i) {
 		std::string formula = random_formula(rng, 3, 3, "&|^>=");
 		std::vector<char> variables = variables_in(formula);
 		size_t rows = static_cast<size_t>(1) << variables.size();
 
-		for (size_t row = 0; row < rows; ++row)
-		{
+		for (size_t row = 0; row < rows; ++row) {
 			std::string literals =
 				substitute(formula, assignment_at(variables, row));
 			bool want = reference_eval(literals);
 			bool got = eval_formula(literals);
 
 			++compared;
-			if (got != want)
-			{
+			if (got != want) {
 				std::printf("eval_formula(\"%s\"): got %s, reference says "
 					"%s\n", literals.c_str(), got ? "true" : "false",
 					want ? "true" : "false");

@@ -9,70 +9,56 @@ static int failures = 0;
 
 // 같은 명세를 다른 코드로 구현한 기준: 모든 대입을 훑어 참이 하나라도
 // 있는지 봅니다. 평가는 ex03 의 스택 기반 평가기가 합니다.
-static bool reference_sat(const std::string &formula)
-{
+static bool reference_sat(const std::string &formula) {
 	std::vector<char> variables = variables_in(formula);
 	size_t rows = static_cast<size_t>(1) << variables.size();
 
-	for (size_t row = 0; row < rows; ++row)
-	{
+	for (size_t row = 0; row < rows; ++row) {
 		if (eval_with(formula, assignment_at(variables, row)))
 			return true;
 	}
 	return false;
 }
 
-static void check(const std::string &formula, bool want)
-{
+static void check(const std::string &formula, bool want) {
 	bool got = sat(formula);
 
-	if (got != want)
-	{
+	if (got != want) {
 		std::printf("sat(\"%s\"): got %s, want %s\n", formula.c_str(),
 			got ? "true" : "false", want ? "true" : "false");
 		++failures;
 	}
 }
 
-static void check_against_reference(const std::string &formula)
-{
-	try
-	{
+static void check_against_reference(const std::string &formula) {
+	try {
 		bool got = sat(formula);
 		bool want = reference_sat(formula);
 
-		if (got != want)
-		{
+		if (got != want) {
 			std::printf("sat(\"%s\"): got %s, reference says %s\n",
 				formula.c_str(), got ? "true" : "false",
 				want ? "true" : "false");
 			++failures;
 		}
-	}
-	catch (const std::exception &e)
-	{
+	} catch (const std::exception &e) {
 		std::printf("sat(\"%s\") threw: %s\n", formula.c_str(), e.what());
 		++failures;
 	}
 }
 
-static void check_throws(const std::string &formula)
-{
-	try
-	{
+static void check_throws(const std::string &formula) {
+	try {
 		bool got = sat(formula);
 
 		std::printf("sat(\"%s\"): returned %s, want a throw\n",
 			formula.c_str(), got ? "true" : "false");
 		++failures;
-	}
-	catch (const std::invalid_argument &)
-	{
+	} catch (const std::invalid_argument &) {
 	}
 }
 
-int main()
-{
+int main() {
 	// subject 의 예시 전체.
 	check("AB|", true);
 	check("AB&", true);

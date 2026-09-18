@@ -10,17 +10,14 @@ uint32_t multiplier(uint32_t a, uint32_t b);
 
 static int failures = 0;
 
-static void check(const char *what, uint32_t got, uint32_t want)
-{
-	if (got != want)
-	{
+static void check(const char *what, uint32_t got, uint32_t want) {
+	if (got != want) {
 		std::printf("%s: got %u, want %u\n", what, got, want);
 		++failures;
 	}
 }
 
-int main()
-{
+int main() {
 	check("adder(0, 0)", adder(0, 0), 0);
 	check("adder(1, 2)", adder(1, 2), 3);
 	check("adder(42, 58)", adder(42, 58), 100);
@@ -43,20 +40,16 @@ int main()
 	long long tested = 0;
 	const uint32_t small = SMALL_BOUND;
 
-	for (uint32_t a = 0; a < small; ++a)
-	{
-		for (uint32_t b = 0; b < small; ++b)
-		{
+	for (uint32_t a = 0; a < small; ++a) {
+		for (uint32_t b = 0; b < small; ++b) {
 			++tested;
-			if (adder(a, b) != a + b)
-			{
+			if (adder(a, b) != a + b) {
 				if (failures < 5)
 					std::printf("adder(%u, %u) != %u\n", a, b, a + b);
 				++failures;
 			}
 #ifdef TEST_MULTIPLIER
-			if (multiplier(a, b) != a * b)
-			{
+			if (multiplier(a, b) != a * b) {
 				if (failures < 5)
 					std::printf("multiplier(%u, %u) != %u\n", a, b, a * b);
 				++failures;
@@ -67,22 +60,19 @@ int main()
 
 	std::mt19937 rng(42);
 
-	for (long long i = 0; i < RANDOM_ROUNDS; ++i)
-	{
+	for (long long i = 0; i < RANDOM_ROUNDS; ++i) {
 		uint32_t a = rng();
 		uint32_t b = rng();
 
 		++tested;
-		if (adder(a, b) != static_cast<uint32_t>(a + b))
-		{
+		if (adder(a, b) != static_cast<uint32_t>(a + b)) {
 			if (failures < 5)
 				std::printf("adder(%u, %u) != %u\n", a, b,
 					static_cast<uint32_t>(a + b));
 			++failures;
 		}
 #ifdef TEST_MULTIPLIER
-		if (multiplier(a, b) != static_cast<uint32_t>(a * b))
-		{
+		if (multiplier(a, b) != static_cast<uint32_t>(a * b)) {
 			if (failures < 5)
 				std::printf("multiplier(%u, %u) != %u\n", a, b,
 					static_cast<uint32_t>(a * b));

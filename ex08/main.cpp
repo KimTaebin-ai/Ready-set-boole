@@ -1,8 +1,7 @@
 #include <iostream>
 #include "powerset.hpp"
 
-static void print(const std::vector<std::vector<int32_t>>& ps)
-{
+static void print(const std::vector<std::vector<int32_t>>& ps) {
 	std::cout << "[";
 	for (size_t i = 0; i < ps.size(); ++i) {
 		std::cout << "{";
@@ -16,8 +15,7 @@ static void print(const std::vector<std::vector<int32_t>>& ps)
 	std::cout << "]" << std::endl;
 }
 
-int main()
-{
+int main() {
 	std::vector<int32_t> a = {};
 	std::vector<int32_t> b = {1};
 	std::vector<int32_t> c = {1, 2, 3};

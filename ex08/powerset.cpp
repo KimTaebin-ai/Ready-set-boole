@@ -9,8 +9,7 @@
 // clear error beats being killed by the allocator halfway through.
 static const size_t max_elements = 25;
 
-std::vector<std::vector<int32_t>> powerset(const std::vector<int32_t>& set)
-{
+std::vector<std::vector<int32_t>> powerset(const std::vector<int32_t>& set) {
 	if (set.size() > max_elements)
 		throw std::length_error("powerset: a set of " +
 			std::to_string(set.size()) + " elements has more subsets than can "
@@ -24,12 +23,10 @@ std::vector<std::vector<int32_t>> powerset(const std::vector<int32_t>& set)
 	// Bit i of the mask says whether set[i] belongs to this subset, so
 	// counting from 0 to 2^n - 1 walks every subset exactly once. Mask 0 is
 	// the empty set, which is a subset of every set.
-	for (size_t mask = 0; mask < subsets; ++mask)
-	{
+	for (size_t mask = 0; mask < subsets; ++mask) {
 		std::vector<int32_t> subset;
 
-		for (size_t i = 0; i < set.size(); ++i)
-		{
+		for (size_t i = 0; i < set.size(); ++i) {
 			if (((mask >> i) & 1) == 1)
 				subset.push_back(set[i]);
 		}

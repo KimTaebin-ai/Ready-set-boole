@@ -2,8 +2,7 @@
 #include <stdexcept>
 #include "eval_formula.hpp"
 
-static void test(const std::string& formula, bool expected)
-{
+static void test(const std::string& formula, bool expected) {
 	bool got = eval_formula(formula);
 	std::cout << "eval_formula(\"" << formula << "\") = "
 	          << (got ? "true" : "false")
@@ -11,25 +10,20 @@ static void test(const std::string& formula, bool expected)
 	          << std::endl;
 }
 
-static void test_invalid(const std::string& formula)
-{
-	try
-	{
+static void test_invalid(const std::string& formula) {
+	try {
 		bool got = eval_formula(formula);
 
 		std::cout << "eval_formula(\"" << formula << "\") = "
 		          << (got ? "true" : "false") << "  [expected a throw]"
 		          << std::endl;
-	}
-	catch (const std::invalid_argument& e)
-	{
+	} catch (const std::invalid_argument& e) {
 		std::cout << "eval_formula(\"" << formula << "\") threw: "
 		          << e.what() << std::endl;
 	}
 }
 
-int main()
-{
+int main() {
 	// Subject examples.
 	test("10&", false);
 	test("10|", true);

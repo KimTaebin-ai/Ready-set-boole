@@ -9,8 +9,7 @@ static const double index_count = 4294967296.0;
 // and the division are exact, so this is the precise upper end of the domain.
 static const double largest = (index_count - 1.0) / index_count;
 
-std::pair<uint16_t, uint16_t> reverse_map(double n)
-{
+std::pair<uint16_t, uint16_t> reverse_map(double n) {
 	// Anything outside what map() produces has no pair to return. Rejecting
 	// it also keeps the scaling below from overflowing a uint32_t.
 	if (!(n >= 0.0 && n <= largest))
@@ -26,8 +25,7 @@ std::pair<uint16_t, uint16_t> reverse_map(double n)
 	uint16_t y = 0;
 
 	// Undo the interleaving: even bits rebuild x, odd bits rebuild y.
-	for (unsigned int i = 0; i < 16; ++i)
-	{
+	for (unsigned int i = 0; i < 16; ++i) {
 		if (((index >> (i * 2)) & 1) == 1)
 			x = static_cast<uint16_t>(x | (1u << i));
 		if (((index >> (i * 2 + 1)) & 1) == 1)

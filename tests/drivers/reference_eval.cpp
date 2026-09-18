@@ -3,16 +3,13 @@
 #include <stdexcept>
 #include <vector>
 
-static bool is_binary_operator(char token)
-{
+static bool is_binary_operator(char token) {
 	return token == '&' || token == '|' || token == '^'
 	    || token == '>' || token == '=';
 }
 
-static bool apply_binary(char token, bool lhs, bool rhs)
-{
-	switch (token)
-	{
+static bool apply_binary(char token, bool lhs, bool rhs) {
+	switch (token) {
 		case '&': return lhs && rhs;                // conjunction
 		case '|': return lhs || rhs;                // disjunction
 		case '^': return lhs != rhs;                // exclusive disjunction
@@ -21,21 +18,17 @@ static bool apply_binary(char token, bool lhs, bool rhs)
 	}
 }
 
-static std::invalid_argument error(const std::string& what, char token)
-{
+static std::invalid_argument error(const std::string& what, char token) {
 	return std::invalid_argument("reference_eval: " + what + " '" + token + "'");
 }
 
-bool reference_eval(const std::string& formula)
-{
+bool reference_eval(const std::string& formula) {
 	std::vector<bool> stack;
 
-	for (char token : formula)
-	{
+	for (char token : formula) {
 		if (token == '0' || token == '1')
 			stack.push_back(token == '1');
-		else if (token == '!')
-		{
+		else if (token == '!') {
 			if (stack.empty())
 				throw error("missing operand for", token);
 
@@ -43,9 +36,7 @@ bool reference_eval(const std::string& formula)
 
 			stack.pop_back();
 			stack.push_back(!operand);
-		}
-		else if (is_binary_operator(token))
-		{
+		} else if (is_binary_operator(token)) {
 			if (stack.size() < 2)
 				throw error("missing operand for", token);
 
@@ -58,8 +49,7 @@ bool reference_eval(const std::string& formula)
 
 			stack.pop_back();
 			stack.push_back(apply_binary(token, lhs, rhs));
-		}
-		else
+		} else
 			throw error("unknown token", token);
 	}
 	if (stack.size() != 1)

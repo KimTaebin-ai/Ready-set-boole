@@ -5,11 +5,9 @@
 #include <stdexcept>
 #include <vector>
 
-namespace
-{
+namespace {
 
-struct Literal
-{
+struct Literal {
 	char name;
 	bool negated;
 };
@@ -20,18 +18,15 @@ struct Literal
 using Clause = std::vector<Literal>;
 using Clauses = std::vector<Clause>;
 
-bool same_literal(const Literal& a, const Literal& b)
-{
+bool same_literal(const Literal& a, const Literal& b) {
 	return a.name == b.name && a.negated == b.negated;
 }
 
 // Adds `literal` unless the clause already holds it. Returns false when the
 // clause already holds the opposite literal: A | !A is always true, so such a
 // clause can be dropped from the conjunction entirely.
-bool add_literal(Clause& clause, const Literal& literal)
-{
-	for (const Literal& kept : clause)
-	{
+bool add_literal(Clause& clause, const Literal& literal) {
+	for (const Literal& kept : clause) {
 		if (kept.name != literal.name)
 			continue;
 		return kept.negated == literal.negated;
@@ -42,36 +37,29 @@ bool add_literal(Clause& clause, const Literal& literal)
 
 // Joins two clauses into their disjunction. Returns false if the result is a
 // tautology.
-bool merge(const Clause& a, const Clause& b, Clause& out)
-{
+bool merge(const Clause& a, const Clause& b, Clause& out) {
 	out.clear();
-	for (const Literal& literal : a)
-	{
+	for (const Literal& literal : a) {
 		if (!add_literal(out, literal))
 			return false;
 	}
-	for (const Literal& literal : b)
-	{
+	for (const Literal& literal : b) {
 		if (!add_literal(out, literal))
 			return false;
 	}
 	return true;
 }
 
-bool same_clause(const Clause& a, const Clause& b)
-{
+bool same_clause(const Clause& a, const Clause& b) {
 	if (a.size() != b.size())
 		return false;
 	// Neither clause repeats a literal, so equal sizes plus containment in
 	// one direction is enough to call them the same set.
-	for (const Literal& literal : a)
-	{
+	for (const Literal& literal : a) {
 		bool found = false;
 
-		for (const Literal& other : b)
-		{
-			if (same_literal(literal, other))
-			{
+		for (const Literal& other : b) {
+			if (same_literal(literal, other)) {
 				found = true;
 				break;
 			}
@@ -85,20 +73,16 @@ bool same_clause(const Clause& a, const Clause& b)
 // Distribution produces the same clause over and over, so dropping duplicates
 // as they are added keeps the intermediate results far smaller than filtering
 // once at the end.
-void add_clause(Clauses& clauses, const Clause& clause)
-{
-	for (const Clause& kept : clauses)
-	{
+void add_clause(Clauses& clauses, const Clause& clause) {
+	for (const Clause& kept : clauses) {
 		if (same_clause(kept, clause))
 			return;
 	}
 	clauses.push_back(clause);
 }
 
-Clauses cnf_of(const Node& node)
-{
-	switch (node.kind)
-	{
+Clauses cnf_of(const Node& node) {
+	switch (node.kind) {
 		case NodeKind::Constant:
 			if (node.value)
 				return Clauses();                    // true
@@ -111,8 +95,7 @@ Clauses cnf_of(const Node& node)
 			// to_nnf() leaves negations sitting only on variables.
 			return Clauses(1, Clause(1, Literal{node.left->name, true}));
 
-		case NodeKind::And:
-		{
+		case NodeKind::And: {
 			Clauses clauses = cnf_of(*node.left);
 			Clauses right = cnf_of(*node.right);
 
@@ -121,17 +104,14 @@ Clauses cnf_of(const Node& node)
 			return clauses;
 		}
 
-		case NodeKind::Or:
-		{
+		case NodeKind::Or: {
 			// Distribute | over &: (x & y) | z becomes (x | z) & (y | z).
 			Clauses left = cnf_of(*node.left);
 			Clauses right = cnf_of(*node.right);
 			Clauses clauses;
 
-			for (const Clause& a : left)
-			{
-				for (const Clause& b : right)
-				{
+			for (const Clause& a : left) {
+				for (const Clause& b : right) {
 					Clause merged;
 
 					if (merge(a, b, merged))
@@ -153,22 +133,18 @@ Clauses cnf_of(const Node& node)
 // X & !X never does. `spare` is a variable from the input, or 0 when the
 // formula had none, which only happens for input the subject does not
 // describe (a formula of bare constants).
-std::string clauses_to_rpn(const Clauses& clauses, char spare)
-{
+std::string clauses_to_rpn(const Clauses& clauses, char spare) {
 	// No clauses left is the empty conjunction, which is always true. Dropping
 	// tautological clauses above is what gets us here.
-	if (clauses.empty())
-	{
+	if (clauses.empty()) {
 		if (spare == 0)
 			return "1";
 		return std::string(1, spare) + spare + "!|";
 	}
-	for (const Clause& clause : clauses)
-	{
+	for (const Clause& clause : clauses) {
 		// An empty clause is the empty disjunction, always false, so the whole
 		// conjunction is false.
-		if (clause.empty())
-		{
+		if (clause.empty()) {
 			if (spare == 0)
 				return "0";
 			return std::string(1, spare) + spare + "!&";
@@ -180,10 +156,8 @@ std::string clauses_to_rpn(const Clauses& clauses, char spare)
 	// Every clause leaves exactly one value on the stack, so all the operands
 	// can be written first and the operators folded in at the end:
 	// "ABC||" is A | (B | C), and the & spine over the clauses works the same.
-	for (const Clause& clause : clauses)
-	{
-		for (const Literal& literal : clause)
-		{
+	for (const Clause& clause : clauses) {
+		for (const Literal& literal : clause) {
 			rpn += literal.name;
 			if (literal.negated)
 				rpn += '!';
@@ -196,8 +170,7 @@ std::string clauses_to_rpn(const Clauses& clauses, char spare)
 
 }   // namespace
 
-std::string conjunctive_normal_form(const std::string& formula)
-{
+std::string conjunctive_normal_form(const std::string& formula) {
 	NodePtr tree = parse_formula(formula);
 	std::vector<char> variables = variables_of(*tree);
 	NodePtr rewritten = to_nnf(*tree);

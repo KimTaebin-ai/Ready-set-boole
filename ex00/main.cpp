@@ -1,8 +1,7 @@
 #include <iostream>
 #include "adder.hpp"
 
-int main()
-{
+int main() {
 	std::cout << "adder(0, 0)            = " << adder(0, 0) << std::endl;
 	std::cout << "adder(1, 2)            = " << adder(1, 2) << std::endl;
 	std::cout << "adder(42, 58)          = " << adder(42, 58) << std::endl;

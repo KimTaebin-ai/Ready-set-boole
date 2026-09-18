@@ -3,8 +3,7 @@
 
 #include <stdexcept>
 
-bool eval_formula(const std::string& formula)
-{
+bool eval_formula(const std::string& formula) {
 	NodePtr tree = parse_formula(formula);
 
 	// This exercise's formulas hold no variables, so there would be no value

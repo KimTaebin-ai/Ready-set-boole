@@ -1,8 +1,7 @@
 #include <iostream>
 #include "eval_set.hpp"
 
-static void print(const std::vector<int32_t>& s)
-{
+static void print(const std::vector<int32_t>& s) {
 	std::cout << "{";
 	for (size_t i = 0; i < s.size(); ++i) {
 		if (i) std::cout << ",";
@@ -11,8 +10,7 @@ static void print(const std::vector<int32_t>& s)
 	std::cout << "}" << std::endl;
 }
 
-int main()
-{
+int main() {
 	// Subject reference examples:
 	std::vector<std::vector<int32_t>> sets1 = {{0, 1, 2}, {0, 3, 4}};
 	std::cout << "eval_set(\"AB&\", [{0,1,2},{0,3,4}]) = ";

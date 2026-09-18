@@ -9,8 +9,7 @@
 // Shared RPN parser and abstract syntax tree for the formula exercises.
 // Copied into each ex folder so every exercise compiles on its own.
 
-enum class NodeKind
-{
+enum class NodeKind {
 	Constant,
 	Variable,
 	Not,
@@ -25,8 +24,7 @@ struct Node;
 
 using NodePtr = std::unique_ptr<Node>;
 
-struct Node
-{
+struct Node {
 	NodeKind kind = NodeKind::Constant;
 	bool value = false;   // Constant only
 	char name = 0;        // Variable only

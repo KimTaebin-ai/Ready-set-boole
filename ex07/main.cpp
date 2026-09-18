@@ -2,8 +2,7 @@
 #include <stdexcept>
 #include "sat.hpp"
 
-static void test(const std::string& formula, bool expected)
-{
+static void test(const std::string& formula, bool expected) {
 	bool got = sat(formula);
 	std::cout << "sat(\"" << formula << "\") = "
 	          << (got ? "true" : "false")
@@ -11,25 +10,20 @@ static void test(const std::string& formula, bool expected)
 	          << std::endl;
 }
 
-static void test_invalid(const std::string& formula)
-{
-	try
-	{
+static void test_invalid(const std::string& formula) {
+	try {
 		bool got = sat(formula);
 
 		std::cout << "sat(\"" << formula << "\") = "
 		          << (got ? "true" : "false")
 		          << "  [expected a throw]" << std::endl;
-	}
-	catch (const std::invalid_argument& e)
-	{
+	} catch (const std::invalid_argument& e) {
 		std::cout << "sat(\"" << formula << "\") threw: " << e.what()
 		          << std::endl;
 	}
 }
 
-int main()
-{
+int main() {
 	// Subject reference examples:
 	test("AB|",  true);
 	test("AB&",  true);

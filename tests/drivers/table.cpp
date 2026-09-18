@@ -9,14 +9,12 @@
 
 static int failures = 0;
 
-struct Capture
-{
+struct Capture {
 	std::string out;
 	std::string err;
 };
 
-static Capture capture(const std::string &formula)
-{
+static Capture capture(const std::string &formula) {
 	std::ostringstream out;
 	std::ostringstream err;
 	std::streambuf *saved_out = std::cout.rdbuf(out.rdbuf());
@@ -33,44 +31,37 @@ static Capture capture(const std::string &formula)
 	return captured;
 }
 
-static void check(const std::string &formula, const std::string &want)
-{
+static void check(const std::string &formula, const std::string &want) {
 	Capture got = capture(formula);
 
-	if (got.out != want)
-	{
+	if (got.out != want) {
 		std::printf("print_truth_table(\"%s\") wrote:\n%s\nwant:\n%s\n",
 			formula.c_str(), got.out.c_str(), want.c_str());
 		++failures;
 	}
-	if (!got.err.empty())
-	{
+	if (!got.err.empty()) {
 		std::printf("print_truth_table(\"%s\") wrote to stderr: %s",
 			formula.c_str(), got.err.c_str());
 		++failures;
 	}
 }
 
-static void check_invalid(const std::string &formula)
-{
+static void check_invalid(const std::string &formula) {
 	Capture got = capture(formula);
 
-	if (!got.out.empty())
-	{
+	if (!got.out.empty()) {
 		std::printf("print_truth_table(\"%s\") is invalid but wrote a "
 			"table:\n%s", formula.c_str(), got.out.c_str());
 		++failures;
 	}
-	if (got.err.empty())
-	{
+	if (got.err.empty()) {
 		std::printf("print_truth_table(\"%s\") is invalid but wrote no "
 			"error message\n", formula.c_str());
 		++failures;
 	}
 }
 
-int main()
-{
+int main() {
 	// subject 의 예시: (A & B) | C
 	check("AB&C|",
 		"| A | B | C | = |\n"

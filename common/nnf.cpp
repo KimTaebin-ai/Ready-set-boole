@@ -9,8 +9,7 @@ static NodePtr rewrite(const Node& node, bool negated);
 //
 //   A = B  ->  (A & B) | (!A & !B)     both operands agree
 //   A ^ B  ->  (A & !B) | (!A & B)     exactly one operand holds
-static NodePtr expand_equivalence(const Node& node, bool exclusive)
-{
+static NodePtr expand_equivalence(const Node& node, bool exclusive) {
 	NodePtr agree = make_binary(NodeKind::And,
 		rewrite(*node.left, false), rewrite(*node.right, exclusive));
 	NodePtr disagree = make_binary(NodeKind::And,
@@ -19,10 +18,8 @@ static NodePtr expand_equivalence(const Node& node, bool exclusive)
 	return make_binary(NodeKind::Or, std::move(agree), std::move(disagree));
 }
 
-static NodePtr rewrite(const Node& node, bool negated)
-{
-	switch (node.kind)
-	{
+static NodePtr rewrite(const Node& node, bool negated) {
+	switch (node.kind) {
 		case NodeKind::Constant:
 			return make_constant(negated ? !node.value : node.value);
 
@@ -36,8 +33,7 @@ static NodePtr rewrite(const Node& node, bool negated)
 			return rewrite(*node.left, !negated);
 
 		case NodeKind::And:
-		case NodeKind::Or:
-		{
+		case NodeKind::Or: {
 			// De Morgan: a negation pushed through & comes out as |.
 			bool is_and = node.kind == NodeKind::And;
 			NodeKind kind = is_and != negated ? NodeKind::And : NodeKind::Or;
@@ -62,7 +58,6 @@ static NodePtr rewrite(const Node& node, bool negated)
 	}
 }
 
-NodePtr to_nnf(const Node& node)
-{
+NodePtr to_nnf(const Node& node) {
 	return rewrite(node, false);
 }

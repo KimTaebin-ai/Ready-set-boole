@@ -4,32 +4,26 @@
 #include "reverse_map.hpp"
 #include "map.hpp"
 
-static void show(double n)
-{
+static void show(double n) {
 	std::pair<uint16_t, uint16_t> point = reverse_map(n);
 
 	std::cout << "reverse_map(" << std::setw(21) << n << ") = ("
 	          << point.first << ", " << point.second << ")" << std::endl;
 }
 
-static void show_invalid(double n)
-{
-	try
-	{
+static void show_invalid(double n) {
+	try {
 		std::pair<uint16_t, uint16_t> point = reverse_map(n);
 
 		std::cout << "reverse_map(" << n << ") = (" << point.first << ", "
 		          << point.second << ")  [expected a throw]" << std::endl;
-	}
-	catch (const std::out_of_range& e)
-	{
+	} catch (const std::out_of_range& e) {
 		std::cout << "reverse_map(" << n << ") threw: " << e.what()
 		          << std::endl;
 	}
 }
 
-int main()
-{
+int main() {
 	std::cout << std::setprecision(17);
 
 	show(0.0);
@@ -43,10 +37,8 @@ int main()
 	size_t checked = 0;
 	size_t mismatches = 0;
 
-	for (uint32_t x = 0; x < 256; ++x)
-	{
-		for (uint32_t y = 0; y < 256; ++y)
-		{
+	for (uint32_t x = 0; x < 256; ++x) {
+		for (uint32_t y = 0; y < 256; ++y) {
 			uint16_t narrow_x = static_cast<uint16_t>(x);
 			uint16_t narrow_y = static_cast<uint16_t>(y);
 			std::pair<uint16_t, uint16_t> back =
@@ -64,8 +56,7 @@ int main()
 	// (f . f^-1)(n) == n for the values map() produces.
 	size_t value_mismatches = 0;
 
-	for (uint32_t i = 0; i < 65536; ++i)
-	{
+	for (uint32_t i = 0; i < 65536; ++i) {
 		double n = static_cast<double>(i) / 4294967296.0;
 		std::pair<uint16_t, uint16_t> point = reverse_map(n);
 

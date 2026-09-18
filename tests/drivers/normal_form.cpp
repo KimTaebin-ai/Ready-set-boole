@@ -5,15 +5,13 @@
 #ifdef TEST_CNF
 # include "conjunctive_normal_form.hpp"
 static const char *NAME = "cnf";
-static std::string transform(const std::string &formula)
-{
+static std::string transform(const std::string &formula) {
 	return conjunctive_normal_form(formula);
 }
 #else
 # include "negation_normal_form.hpp"
 static const char *NAME = "nnf";
-static std::string transform(const std::string &formula)
-{
+static std::string transform(const std::string &formula) {
 	return negation_normal_form(formula);
 }
 #endif
@@ -29,16 +27,13 @@ static int failures = 0;
 // 출력에도 0 이나 1 이 나와선 안 됩니다. allow_constants 는 subject 범위 밖인
 // 상수 입력을 시험할 때만 켭니다.
 static bool is_nnf(const std::string &formula, std::string &why,
-	bool allow_constants)
-{
-	for (size_t i = 0; i < formula.size(); ++i)
-	{
+	bool allow_constants) {
+	for (size_t i = 0; i < formula.size(); ++i) {
 		char token = formula[i];
 
 		if (token >= 'A' && token <= 'Z')
 			continue;
-		if (token == '0' || token == '1')
-		{
+		if (token == '0' || token == '1') {
 			if (allow_constants)
 				continue;
 			why = std::string("result holds the constant '") + token
@@ -47,10 +42,8 @@ static bool is_nnf(const std::string &formula, std::string &why,
 		}
 		if (token == '&' || token == '|')
 			continue;
-		if (token == '!')
-		{
-			if (i == 0 || !(formula[i - 1] >= 'A' && formula[i - 1] <= 'Z'))
-			{
+		if (token == '!') {
+			if (i == 0 || !(formula[i - 1] >= 'A' && formula[i - 1] <= 'Z')) {
 				why = "'!' is not directly after a variable";
 				return false;
 			}
@@ -66,24 +59,20 @@ static bool is_nnf(const std::string &formula, std::string &why,
 // CNF: NNF 조건에 더해, | 안에 & 가 들어 있으면 안 됩니다. 스택 원소의
 // 수준을 0=리터럴, 1=절, 2=논리곱으로 두고 | 의 피연산자를 확인합니다.
 static bool is_cnf(const std::string &formula, std::string &why,
-	bool allow_constants)
-{
+	bool allow_constants) {
 	if (!is_nnf(formula, why, allow_constants))
 		return false;
 
 	std::vector<int> levels;
 
-	for (char token : formula)
-	{
-		if ((token >= 'A' && token <= 'Z') || token == '0' || token == '1')
-		{
+	for (char token : formula) {
+		if ((token >= 'A' && token <= 'Z') || token == '0' || token == '1') {
 			levels.push_back(0);
 			continue;
 		}
 		if (token == '!')
 			continue;   // 리터럴의 수준을 바꾸지 않습니다
-		if (levels.size() < 2)
-		{
+		if (levels.size() < 2) {
 			why = "malformed output";
 			return false;
 		}
@@ -95,20 +84,16 @@ static bool is_cnf(const std::string &formula, std::string &why,
 		int lhs = levels.back();
 
 		levels.pop_back();
-		if (token == '|')
-		{
-			if (lhs == 2 || rhs == 2)
-			{
+		if (token == '|') {
+			if (lhs == 2 || rhs == 2) {
 				why = "'&' is nested inside a '|'";
 				return false;
 			}
 			levels.push_back(1);
-		}
-		else
+		} else
 			levels.push_back(2);
 	}
-	if (levels.size() != 1)
-	{
+	if (levels.size() != 1) {
 		why = "malformed output";
 		return false;
 	}
@@ -117,8 +102,7 @@ static bool is_cnf(const std::string &formula, std::string &why,
 #endif
 
 static bool structure_ok(const std::string &formula, std::string &why,
-	bool allow_constants)
-{
+	bool allow_constants) {
 #ifdef TEST_CNF
 	return is_cnf(formula, why, allow_constants);
 #else
@@ -126,12 +110,10 @@ static bool structure_ok(const std::string &formula, std::string &why,
 #endif
 }
 
-static void check_exact(const std::string &formula, const std::string &want)
-{
+static void check_exact(const std::string &formula, const std::string &want) {
 	std::string got = transform(formula);
 
-	if (got != want)
-	{
+	if (got != want) {
 		std::printf("%s(\"%s\"): got \"%s\", want \"%s\"\n", NAME,
 			formula.c_str(), got.c_str(), want.c_str());
 		++failures;
@@ -139,16 +121,12 @@ static void check_exact(const std::string &formula, const std::string &want)
 }
 
 // 결과가 구조 조건을 만족하고 원식과 논리적으로 같은지 확인합니다.
-static void check_formula(const std::string &formula)
-{
+static void check_formula(const std::string &formula) {
 	std::string result;
 
-	try
-	{
+	try {
 		result = transform(formula);
-	}
-	catch (const std::exception &e)
-	{
+	} catch (const std::exception &e) {
 		std::printf("%s(\"%s\") threw: %s\n", NAME, formula.c_str(), e.what());
 		++failures;
 		return;
@@ -159,37 +137,30 @@ static void check_formula(const std::string &formula)
 	bool had_constants = formula.find('0') != std::string::npos
 		|| formula.find('1') != std::string::npos;
 
-	if (!structure_ok(result, why, had_constants))
-	{
+	if (!structure_ok(result, why, had_constants)) {
 		std::printf("%s(\"%s\") = \"%s\" is not in normal form: %s\n", NAME,
 			formula.c_str(), result.c_str(), why.c_str());
 		++failures;
 	}
-	if (!equivalent(formula, result))
-	{
+	if (!equivalent(formula, result)) {
 		std::printf("%s(\"%s\") = \"%s\" is not equivalent to its input\n",
 			NAME, formula.c_str(), result.c_str());
 		++failures;
 	}
 }
 
-static void check_throws(const std::string &formula)
-{
-	try
-	{
+static void check_throws(const std::string &formula) {
+	try {
 		std::string got = transform(formula);
 
 		std::printf("%s(\"%s\"): returned \"%s\", want a throw\n", NAME,
 			formula.c_str(), got.c_str());
 		++failures;
-	}
-	catch (const std::invalid_argument &)
-	{
+	} catch (const std::invalid_argument &) {
 	}
 }
 
-int main()
-{
+int main() {
 	// subject 의 예시 전체.
 #ifdef TEST_CNF
 	check_exact("AB&!", "A!B!|");

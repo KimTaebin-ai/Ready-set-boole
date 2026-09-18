@@ -2,13 +2,11 @@
 
 #include <stdexcept>
 
-static std::invalid_argument error(const std::string& what, char token)
-{
+static std::invalid_argument error(const std::string& what, char token) {
 	return std::invalid_argument("parse_formula: " + what + " '" + token + "'");
 }
 
-NodePtr make_constant(bool value)
-{
+NodePtr make_constant(bool value) {
 	NodePtr node = std::make_unique<Node>();
 
 	node->kind = NodeKind::Constant;
@@ -16,8 +14,7 @@ NodePtr make_constant(bool value)
 	return node;
 }
 
-NodePtr make_variable(char name)
-{
+NodePtr make_variable(char name) {
 	NodePtr node = std::make_unique<Node>();
 
 	node->kind = NodeKind::Variable;
@@ -25,8 +22,7 @@ NodePtr make_variable(char name)
 	return node;
 }
 
-NodePtr make_not(NodePtr child)
-{
+NodePtr make_not(NodePtr child) {
 	NodePtr node = std::make_unique<Node>();
 
 	node->kind = NodeKind::Not;
@@ -34,8 +30,7 @@ NodePtr make_not(NodePtr child)
 	return node;
 }
 
-NodePtr make_binary(NodeKind kind, NodePtr left, NodePtr right)
-{
+NodePtr make_binary(NodeKind kind, NodePtr left, NodePtr right) {
 	NodePtr node = std::make_unique<Node>();
 
 	node->kind = kind;
@@ -45,10 +40,8 @@ NodePtr make_binary(NodeKind kind, NodePtr left, NodePtr right)
 }
 
 // Returns false for tokens that are not binary operators.
-static bool binary_kind_of(char token, NodeKind& kind)
-{
-	switch (token)
-	{
+static bool binary_kind_of(char token, NodeKind& kind) {
+	switch (token) {
 		case '&': kind = NodeKind::And;        return true;
 		case '|': kind = NodeKind::Or;         return true;
 		case '^': kind = NodeKind::Xor;        return true;
@@ -62,17 +55,14 @@ static bool binary_kind_of(char token, NodeKind& kind)
 // recursive walks below stay well inside the stack.
 static const size_t max_tree_depth = 10000;
 
-static void check_depth(size_t depth)
-{
+static void check_depth(size_t depth) {
 	if (depth > max_tree_depth)
 		throw std::invalid_argument("parse_formula: formula nests deeper than "
 			+ std::to_string(max_tree_depth) + " operators");
 }
 
-static char symbol_of(NodeKind kind)
-{
-	switch (kind)
-	{
+static char symbol_of(NodeKind kind) {
+	switch (kind) {
 		case NodeKind::And:     return '&';
 		case NodeKind::Or:      return '|';
 		case NodeKind::Xor:     return '^';
@@ -81,8 +71,7 @@ static char symbol_of(NodeKind kind)
 	}
 }
 
-NodePtr parse_formula(const std::string& formula)
-{
+NodePtr parse_formula(const std::string& formula) {
 	std::vector<NodePtr> stack;
 	// Parsing itself is a loop, but everything that later walks the tree
 	// recurses, the destructor included. Tracking depth here lets an
@@ -91,22 +80,16 @@ NodePtr parse_formula(const std::string& formula)
 	// frames, so the cap keeps a wide margin.
 	std::vector<size_t> depths;
 
-	for (char token : formula)
-	{
+	for (char token : formula) {
 		NodeKind kind;
 
-		if (token == '0' || token == '1')
-		{
+		if (token == '0' || token == '1') {
 			stack.push_back(make_constant(token == '1'));
 			depths.push_back(1);
-		}
-		else if (token >= 'A' && token <= 'Z')
-		{
+		} else if (token >= 'A' && token <= 'Z') {
 			stack.push_back(make_variable(token));
 			depths.push_back(1);
-		}
-		else if (token == '!')
-		{
+		} else if (token == '!') {
 			if (stack.empty())
 				throw error("missing operand for", token);
 
@@ -116,9 +99,7 @@ NodePtr parse_formula(const std::string& formula)
 			stack.push_back(make_not(std::move(child)));
 			depths.back() += 1;
 			check_depth(depths.back());
-		}
-		else if (binary_kind_of(token, kind))
-		{
+		} else if (binary_kind_of(token, kind)) {
 			if (stack.size() < 2)
 				throw error("missing operand for", token);
 
@@ -143,8 +124,7 @@ NodePtr parse_formula(const std::string& formula)
 			depths.push_back(
 				1 + (left_depth > right_depth ? left_depth : right_depth));
 			check_depth(depths.back());
-		}
-		else
+		} else
 			throw error("unknown token", token);
 	}
 	if (stack.size() != 1)
@@ -153,10 +133,8 @@ NodePtr parse_formula(const std::string& formula)
 	return std::move(stack.front());
 }
 
-static void append_rpn(const Node& node, std::string& out)
-{
-	switch (node.kind)
-	{
+static void append_rpn(const Node& node, std::string& out) {
+	switch (node.kind) {
 		case NodeKind::Constant:
 			out += node.value ? '1' : '0';
 			return;
@@ -178,18 +156,15 @@ static void append_rpn(const Node& node, std::string& out)
 	out += symbol_of(node.kind);
 }
 
-std::string to_rpn(const Node& node)
-{
+std::string to_rpn(const Node& node) {
 	std::string rpn;
 
 	append_rpn(node, rpn);
 	return rpn;
 }
 
-bool evaluate(const Node& node, const Assignment& values)
-{
-	switch (node.kind)
-	{
+bool evaluate(const Node& node, const Assignment& values) {
+	switch (node.kind) {
 		case NodeKind::Constant: return node.value;
 		case NodeKind::Variable: return values[node.name - 'A'];
 		case NodeKind::Not:      return !evaluate(*node.left, values);
@@ -199,8 +174,7 @@ bool evaluate(const Node& node, const Assignment& values)
 	bool lhs = evaluate(*node.left, values);
 	bool rhs = evaluate(*node.right, values);
 
-	switch (node.kind)
-	{
+	switch (node.kind) {
 		case NodeKind::And:     return lhs && rhs;
 		case NodeKind::Or:      return lhs || rhs;
 		case NodeKind::Xor:     return lhs != rhs;
@@ -209,8 +183,7 @@ bool evaluate(const Node& node, const Assignment& values)
 	}
 }
 
-static void mark_variables(const Node& node, Assignment& seen)
-{
+static void mark_variables(const Node& node, Assignment& seen) {
 	if (node.kind == NodeKind::Variable)
 		seen[node.name - 'A'] = true;
 	if (node.left)
@@ -219,26 +192,22 @@ static void mark_variables(const Node& node, Assignment& seen)
 		mark_variables(*node.right, seen);
 }
 
-std::vector<char> variables_of(const Node& node)
-{
+std::vector<char> variables_of(const Node& node) {
 	Assignment seen = {};
 	std::vector<char> variables;
 
 	mark_variables(node, seen);
-	for (int i = 0; i < 26; ++i)
-	{
+	for (int i = 0; i < 26; ++i) {
 		if (seen[i])
 			variables.push_back(static_cast<char>('A' + i));
 	}
 	return variables;
 }
 
-Assignment assignment_of(const std::vector<char>& variables, size_t row)
-{
+Assignment assignment_of(const std::vector<char>& variables, size_t row) {
 	Assignment values = {};
 
-	for (size_t i = 0; i < variables.size(); ++i)
-	{
+	for (size_t i = 0; i < variables.size(); ++i) {
 		size_t bit = variables.size() - 1 - i;
 
 		values[variables[i] - 'A'] = ((row >> bit) & 1) == 1;
