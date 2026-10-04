@@ -3,6 +3,7 @@
 
 # include <cstdint>
 
+// Subject limit:    none (N/A)
 // Time complexity:  O(1)
 // Space complexity: O(1)
 // Allowed: bitwise ops (& | ^ << >>) and comparison ops only.

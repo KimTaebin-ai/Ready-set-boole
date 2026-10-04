@@ -3,8 +3,10 @@
 
 # include <string>
 
-// Time complexity:  O(n)   n = length of formula
-// Space complexity: O(n)
+// Subject limit:    time O(n), space N/A
+// Time complexity:  O(n)   n = length of formula: one pass to parse, one walk
+//                          to collect variables, one walk to evaluate
+// Space complexity: O(n)   the tree holds one node per token
 //
 // Evaluates an RPN (postfix) boolean formula.
 // Tokens:

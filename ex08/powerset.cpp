@@ -25,7 +25,13 @@ std::vector<std::vector<int32_t>> powerset(const std::vector<int32_t>& set) {
 	// the empty set, which is a subset of every set.
 	for (size_t mask = 0; mask < subsets; ++mask) {
 		std::vector<int32_t> subset;
+		size_t members = 0;
 
+		// Sized up front so push_back never grows past what the subset holds:
+		// the space limit counts the returned value, slack included.
+		for (size_t bits = mask; bits != 0; bits >>= 1)
+			members += bits & 1;
+		subset.reserve(members);
 		for (size_t i = 0; i < set.size(); ++i) {
 			if (((mask >> i) & 1) == 1)
 				subset.push_back(set[i]);

@@ -3,6 +3,7 @@
 
 # include <cstdint>
 
+// Subject limit:    none (N/A)
 // Time complexity:  O(1)   (bounded by 16 bit-pair iterations)
 // Space complexity: O(1)
 //

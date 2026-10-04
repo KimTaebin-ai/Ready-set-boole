@@ -3,10 +3,13 @@
 
 # include <string>
 
-// Time complexity:  O(n) for !, & and |; exponential in the number of nested
-//                   >, = and ^ operators, which are rewritten by duplicating
-//                   their operands. The subject sets no limit here.
-// Space complexity: same as the size of the returned formula.
+// Subject limit:    none (N/A)
+// Time complexity:  O(n) for formulas built from !, &, | and >: each of those
+//                   rewrites its operands once (A > B becomes !A | B).
+//                   = and ^ are rewritten by writing both operands twice, so
+//                   every nesting level of them doubles the output:
+//                   AB=C=D=... grows about 2x per operator, up to O(2^n).
+// Space complexity: proportional to the size of the returned formula.
 //
 // Returns the negation normal form of an RPN boolean formula:
 //   - only !, &, | operators may appear in the result

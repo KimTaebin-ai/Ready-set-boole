@@ -5,6 +5,7 @@
 # include <vector>
 # include <cstdint>
 
+// Subject limit:    none (N/A)
 // Time complexity:  O(T log T + U * (n + k log T))   U = universe size,
 //                   n = formula length, k = number of sets, T = total number
 //                   of elements given. Each element of the universe is tested

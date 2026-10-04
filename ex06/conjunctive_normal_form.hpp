@@ -3,8 +3,15 @@
 
 # include <string>
 
-// Time complexity:  O(2^n) worst-case (distribution can blow up)
-// Space complexity: O(2^n) worst-case
+// Subject limit:    none (N/A)
+// Time complexity:  exponential in the worst case. The NNF step can already
+//                   double the formula at each nested = or ^ (see ex05), and
+//                   distributing | over & multiplies clause counts on top of
+//                   that. No tighter bound is claimed.
+// Space complexity: exponential in the worst case. The result itself is
+//                   bounded: duplicate and always-true clauses are dropped,
+//                   so it holds at most 3^k distinct clauses for k variables
+//                   (each variable appears plain, negated, or not at all).
 //
 // Returns the conjunctive normal form (clauses of disjunctions ANDed
 // together) of an RPN boolean formula. Runs the shared NNF rewrite from ex05

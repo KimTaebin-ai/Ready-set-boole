@@ -4,7 +4,8 @@
 # include <cstdint>
 # include <utility>
 
-// Time complexity:  O(1)
+// Subject limit:    none (N/A)
+// Time complexity:  O(1)   (bounded by 16 bit-pair iterations)
 // Space complexity: O(1)
 //
 // Inverse of ex10's map(): takes a value map() produced and returns the
