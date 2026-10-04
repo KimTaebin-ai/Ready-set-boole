@@ -1,4 +1,4 @@
-NAME = eval_formula
+NAME = ex03
 
 SRCS = eval_formula.cpp main.cpp
 SHARED = ../common/ast.cpp

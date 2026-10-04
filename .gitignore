@@ -5,15 +5,15 @@ target
 obj/
 
 # 각 ex 의 바이너리 (Makefile 의 NAME)
-ex*/adder
-ex*/multiplier
-ex*/gray_code
-ex*/eval_formula
-ex*/print_truth_table
-ex*/negation_normal_form
-ex*/conjunctive_normal_form
-ex*/sat
-ex*/powerset
-ex*/eval_set
-ex*/map
-ex*/reverse_map
+ex*/ex00
+ex*/ex01
+ex*/ex02
+ex*/ex03
+ex*/ex04
+ex*/ex05
+ex*/ex06
+ex*/ex07
+ex*/ex08
+ex*/ex09
+ex*/ex10
+ex*/ex11

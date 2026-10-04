@@ -1,4 +1,4 @@
-NAME = map
+NAME = ex10
 
 SRCS = map.cpp main.cpp
 

@@ -1,4 +1,4 @@
-NAME = adder
+NAME = ex00
 
 SRCS = adder.cpp main.cpp
 

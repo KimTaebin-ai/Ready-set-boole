@@ -1,4 +1,4 @@
-NAME = powerset
+NAME = ex08
 
 SRCS = powerset.cpp main.cpp
 

@@ -1,28 +1,15 @@
-#include <iostream>
 #include "print_truth_table.hpp"
 
-static void test(const std::string& formula) {
-	std::cout << "Truth table for " << formula << std::endl;
-	print_truth_table(formula);
-	std::cout << std::endl;
-}
-
-int main() {
-	// Subject example: (A & B) | C
-	test("AB&C|");
-
-	test("A");
-	test("A!");
-	test("AB=");
-	test("AB>");
-	test("AB^");
-	test("ABC^^");
-
-	// A formula with no variable at all still has a result column.
-	test("10&");
-
-	// Malformed input.
-	test("AB&&");
-	test("AB&Z");
+// With no argument, `./ex04 | cat -e` writes exactly the subject's example
+// table for (A & B) | C. Each argument given is printed as its own table:
+//
+//   ./ex04 'AB=' 'ABC^^' 'AB&&'
+int main(int argc, char** argv) {
+	if (argc < 2) {
+		print_truth_table("AB&C|");
+		return 0;
+	}
+	for (int i = 1; i < argc; ++i)
+		print_truth_table(argv[i]);
 	return 0;
 }

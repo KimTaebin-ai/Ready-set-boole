@@ -1,4 +1,4 @@
-NAME = gray_code
+NAME = ex02
 
 SRCS = gray_code.cpp main.cpp
 
